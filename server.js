@@ -1,8 +1,11 @@
 // database is let instead of const to allow us to modify it in test.js
+// next[Whatever]Id fields represent "auto-incrementing" unique ID's for those models.
 let database = {
   users: {},
   articles: {},
-  nextArticleId: 1
+  comments: {},
+  nextArticleId: 1,
+  nextCommentId: 1
 };
 
 const routes = {
@@ -26,6 +29,19 @@ const routes = {
   },
   '/articles/:id/downvote': {
     'PUT': downvoteArticle
+  },
+  '/comments': {
+    'POST': createComment
+  },
+  '/comments/:id': {
+    'PUT': updateComment,
+    'DELETE': deleteComment
+  },
+  '/comments/:id/upvote': {
+    'PUT': upvoteComment
+  },
+  '/comments/:id/downvote': {
+    'PUT': downvoteComment
   }
 };
 
@@ -218,6 +234,26 @@ function downvoteArticle(url, request) {
   }
 
   return response;
+}
+
+function createComment(url, request) {
+
+}
+
+function updateComment(url, request) {
+
+}
+
+function deleteComment(url, request) {
+
+}
+
+function upvoteComment(url, request) {
+
+}
+
+function downvoteComment(url, request) {
+
 }
 
 function upvote(item, username) {
