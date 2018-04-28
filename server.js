@@ -133,7 +133,7 @@ function createArticle(url, request) {
   const response = {};
 
   if (requestArticle && requestArticle.title && requestArticle.url &&
-      requestArticle.username && database.users[requestArticle.username]) {
+      requestArticle.username && userExists(requestArticle.username)) {
     const article = {
       id: database.nextArticleId++,
       title: requestArticle.title,
@@ -206,7 +206,7 @@ function upvoteArticle(url, request) {
   let savedArticle = database.articles[id];
   const response = {};
 
-  if (savedArticle && database.users[username]) {
+  if (savedArticle && userExists(username)) {
     savedArticle = upvote(savedArticle, username);
 
     response.body = {article: savedArticle};
@@ -224,7 +224,7 @@ function downvoteArticle(url, request) {
   let savedArticle = database.articles[id];
   const response = {};
 
-  if (savedArticle && database.users[username]) {
+  if (savedArticle && userExists(username)) {
     savedArticle = downvote(savedArticle, username);
 
     response.body = {article: savedArticle};
@@ -237,7 +237,32 @@ function downvoteArticle(url, request) {
 }
 
 function createComment(url, request) {
+  const requestComment = request.body && request.body.comment;
+  const response = {};
+  const hasRequiredFields = requestComment
+    && requestComment.body
+    && requestComment.username
+    && requestComment.articleId;
 
+  if (hasRequiredFields && userExists(requestComment.username) && articleExists(requestComment.articleId)) {
+    const comment = {
+      ...requestComment,
+      id: database.nextCommentId++,
+      upvotedBy: [],
+      downvotedBy: []
+    };
+
+    database.users[comment.username].commentIds.push(comment.id);
+    database.articles[comment.articleId].commentIds.push(comment.id);
+    database.comments[comment.id] = comment;
+
+    response.body = { comment: comment };
+    response.status = 201;
+  } else {
+    response.status = 400;
+  }
+
+  return response;
 }
 
 function updateComment(url, request) {
@@ -274,6 +299,14 @@ function downvote(item, username) {
     item.downvotedBy.push(username);
   }
   return item;
+}
+
+function userExists(username) {
+  return Boolean(database.users[username]);
+}
+
+function articleExists(id) {
+  return Boolean(database.articles[id]);
 }
 
 // Write all code above this line.
