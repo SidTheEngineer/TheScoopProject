@@ -109,7 +109,7 @@ function getArticles(url, request) {
 }
 
 function getArticle(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const id = getIdFromURL(url);
   const article = database.articles[id];
   const response = {};
 
@@ -157,7 +157,7 @@ function createArticle(url, request) {
 }
 
 function updateArticle(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const id = getIdFromURL(url);
   const savedArticle = database.articles[id];
   const requestArticle = request.body && request.body.article;
   const response = {};
@@ -178,7 +178,7 @@ function updateArticle(url, request) {
 }
 
 function deleteArticle(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const id = getIdFromURL(url);
   const savedArticle = database.articles[id];
   const response = {};
 
@@ -201,7 +201,7 @@ function deleteArticle(url, request) {
 }
 
 function upvoteArticle(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const id = getIdFromURL(url);
   const username = request.body && request.body.username;
   let savedArticle = database.articles[id];
   const response = {};
@@ -219,7 +219,7 @@ function upvoteArticle(url, request) {
 }
 
 function downvoteArticle(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const id = getIdFromURL(url);
   const username = request.body && request.body.username;
   let savedArticle = database.articles[id];
   const response = {};
@@ -256,7 +256,7 @@ function createComment(url, request) {
     database.articles[comment.articleId].commentIds.push(comment.id);
     database.comments[comment.id] = comment;
 
-    response.body = { comment: comment };
+    response.body = { comment };
     response.status = 201;
   } else {
     response.status = 400;
@@ -266,7 +266,21 @@ function createComment(url, request) {
 }
 
 function updateComment(url, request) {
+  const id = getIdFromURL(url);
+  const updatedComment = request.body && request.body.comment;
+  const response = {};
 
+  if (!updatedComment) {
+    response.status = 400;
+  } else if (!commentExists(id)) {
+    response.status = 404;
+  } else {
+    const currentComment = database.comments[id];
+    currentComment.body = updatedComment.body || currentComment.body;
+    response.status = 200;
+  }
+
+  return response;
 }
 
 function deleteComment(url, request) {
@@ -307,6 +321,14 @@ function userExists(username) {
 
 function articleExists(id) {
   return Boolean(database.articles[id]);
+}
+
+function commentExists(id) {
+  return Boolean(database.comments[id]);
+}
+
+function getIdFromURL(url) {
+  return Number(url.split('/').filter(segment => segment)[1]);
 }
 
 // Write all code above this line.
