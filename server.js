@@ -380,7 +380,7 @@ function getIdFromURL(url) {
 
 function saveDatabase() {
   fs.writeFile('database.yaml', yaml.safeDump(database), err => {
-    console.log(err);
+    if (err) console.log(err);
   });
 }
 
