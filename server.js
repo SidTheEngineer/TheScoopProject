@@ -1,3 +1,6 @@
+const yaml = require('js-yaml');
+const fs = require('fs');
+
 // database is let instead of const to allow us to modify it in test.js
 // next[Whatever]Id fields represent "auto-incrementing" unique ID's for those models.
 let database = {
@@ -375,6 +378,20 @@ function getIdFromURL(url) {
   return Number(url.split('/').filter(segment => segment)[1]);
 }
 
+function saveDatabase() {
+  fs.writeFile('database.yaml', yaml.safeDump(database), err => {
+    console.log(err);
+  });
+}
+
+function loadDatabase() {
+  try {
+    return yaml.safeLoad(fs.readFileSync('database.yaml', 'utf8'));;
+  } catch (e) {
+    return database;
+  }
+}
+
 // Write all code above this line.
 
 const http = require('http');
@@ -399,7 +416,7 @@ const requestHandler = (request, response) => {
     return response.end();
   }
 
-  response.setHeader('Access-Control-Allow-Origin', null);
+  response.setHeader('Access-Control-Allow-Origin', "*");
   response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.setHeader(
       'Access-Control-Allow-Headers', 'X-Requested-With,content-type');

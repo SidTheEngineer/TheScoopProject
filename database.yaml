@@ -1,0 +1,33 @@
+users:
+  Test:
+    username: Test
+    articleIds:
+      - 1
+    commentIds:
+      - 1
+  Sidney:
+    username: Sidney
+    articleIds: []
+    commentIds: []
+articles:
+  '1':
+    id: 1
+    title: This is a test article!
+    url: testurl.example
+    username: Test
+    commentIds:
+      - 1
+    upvotedBy: []
+    downvotedBy: []
+    comments:
+      - &ref_0
+        body: This is a test comment!
+        articleId: 1
+        username: Test
+        id: 1
+        upvotedBy: []
+        downvotedBy: []
+comments:
+  '1': *ref_0
+nextArticleId: 2
+nextCommentId: 2
