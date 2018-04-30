@@ -386,7 +386,7 @@ function saveDatabase() {
 
 function loadDatabase() {
   try {
-    return yaml.safeLoad(fs.readFileSync('database.yaml', 'utf8'));;
+    return yaml.safeLoad(fs.readFileSync('database.yaml', 'utf8'));
   } catch (e) {
     return database;
   }
