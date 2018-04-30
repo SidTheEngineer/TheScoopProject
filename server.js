@@ -284,15 +284,59 @@ function updateComment(url, request) {
 }
 
 function deleteComment(url, request) {
+  const id = getIdFromURL(url);
+  const response = {};
 
+  if (!commentExists(id)) {
+    response.status = 404;
+  } else {
+    const comment = database.comments[id];
+    const userCommentIds = database.users[comment.username].commentIds;
+    const articleCommentIds = database.articles[comment.articleId].commentIds;
+
+    userCommentIds.splice(userCommentIds.indexOf(id), 1);
+    articleCommentIds.splice(articleCommentIds.indexOf(id), 1);
+    database.comments[id] = null;
+    response.status = 204;
+  }
+
+  return response;
 }
 
 function upvoteComment(url, request) {
+  const id = getIdFromURL(url);
+  const username = request.body && request.body.username;
+  const response = {};
+  let savedComment = database.comments[id];
 
+  if (savedComment && userExists(username)) {
+    savedComment = upvote(savedComment, username);
+
+    response.body = { comment: savedComment };
+    response.status = 200;
+  } else {
+    response.status = 400;
+  }
+
+  return response;
 }
 
 function downvoteComment(url, request) {
+  const id = getIdFromURL(url);
+  const username = request.body && request.body.username;
+  const response = {};
+  let savedComment = database.comments[id];
 
+  if (savedComment && userExists(username)) {
+    savedComment = downvote(savedComment, username);
+
+    response.body = { comment: savedComment };
+    response.status = 200;
+  } else {
+    response.status = 400;
+  }
+
+  return response;
 }
 
 function upvote(item, username) {
